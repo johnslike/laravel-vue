@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UsersController;
 use App\Http\Controllers\ApplicationController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,5 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/api/users', [UsersController::class, 'index']);
+Route::post('/api/users', [UsersController::class, 'store']);
 
 Route::get('{view}', ApplicationController::class)->where('view', '(.*)');

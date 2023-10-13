@@ -1,16 +1,40 @@
 <script setup>
-const users = [
-    {   
-    id: 1,
-    name: 'John Doe',
-    email: 'john@gmail.com'
-},
-{   
-    id: 2,
-    name: 'Victor Doe',
-    email: 'victor@gmail.com'
+
+import axios from 'axios';
+
+import { ref, onMounted, reactive } from 'vue';
+
+
+const users = ref([]);
+
+const form = reactive({
+    name: '',
+    email: '',
+    password: '',
+});
+
+const getUsers = () => {
+    axios.get('/api/users')
+    .then((response) => {
+        users.value = response.data;
+    })
 }
-];
+
+const createUser = () => {
+    axios.post('/api/users', form)
+    .then((response) => {
+        users.value.unshift(response.data);
+        form.name = '';
+        form.email = '';
+        form.password = '';
+        $('#addusers').modal('hide');
+    });
+}
+
+
+onMounted(() => {
+    getUsers();
+});
 </script>
 
 <template>
@@ -45,8 +69,8 @@ const users = [
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="user in users" :key="user.id">
-                                <td>{{ user.id }}</td>
+                            <tr v-for="(user, index) in users" :key="user.id">
+                                <td>{{ index + 1}}</td>
                                 <td>{{ user.name }}</td>
                                 <td>{{ user.email }}</td>
                                 <td></td>
@@ -56,7 +80,45 @@ const users = [
                     </table>
                 </div>
             </div>
+            <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addusers"> Add New User</button>
         </div>
     </div>
+
+
+
+    <div class="modal fade" id="addusers">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Add new User</h4>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input v-model="form.name" type="text" class="form-control" name="" id="name" placeholder="Enter...">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input v-model="form.email" type="text" class="form-control" name="" id="email" placeholder="Enter...">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input v-model="form.password" type="text" class="form-control" name="" id="password" placeholder="Enter...">
+                </div>
+
+            </div>
+            <div class="modal-footer justify-content-between">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <button type="button" @click="createUser" class="btn btn-primary">Save</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
 
 </template>
